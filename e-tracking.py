@@ -4,7 +4,12 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from ocr import OCR
 
+class CodeNotFound(Exception):
+    pass
+class VerifyError(Exception):
+    pass
 class ECTracker():
     def __init__(self):
         self.api = 'https://eservice.7-11.com.tw/E-Tracking'
@@ -39,16 +44,25 @@ class ECTracker():
                 response.raise_for_status()
             with open('./codeImg.jpg', 'wb') as file_io:
                 file_io.write(response.content)
-    def tracker(self, txtProductNum):
+    def tracker(self, txtProductNum, autoVerify=False):
         resource = self.get_resource()
-        code = input('請輸入驗證碼: ')
+        if not autoVerify:
+            code = input('請輸入驗證碼: ')
+        else:
+            try:
+                ocr = OCR()
+                code = ocr.convert('./codeImg.jpg')
+            except:
+                raise Exception
+        if not code:
+            raise CodeNotFound('can\'t identify image.')
         payload = {
             '__LASTFOCUS': '',
             '__EVENTTARGET': '',
             '__EVENTARGUMENT': '',
             '__VIEWSTATE':resource['__VIEWSTATE'],
             '__VIEWSTATEGENERATOR':resource['__VIEWSTATEGENERATOR'],
-            'txtProductNum':'F45913208600',
+            'txtProductNum':txtProductNum,
             'tbChkCode':code,
             'aaa': '',
             'txtIMGName': '',
@@ -58,33 +72,35 @@ class ECTracker():
             if response.status_code != 200:
                 response.raise_for_status()
             body = BeautifulSoup(response.text, 'html.parser')
-            info_children = body.find('div', {'class': 'info'}).find_all('div', recursive=False)
-            shipping = body.find('div', {'class': 'shipping'})
-            pickup_info = info_children[0]
-            #取貨門市
-            store_name = pickup_info.find('span', {'id': 'store_name'}).text
-            #取貨門市地址
-            store_address = pickup_info.find('p', {'id': 'store_address'}).text
-            #取貨截止日
-            pickup_deadline = pickup_info.find('span', {'id': 'deadline'}).text
-            #付款資訊
-            payment_type = info_children[1].find('h4', {'id': 'servicetype'}).text
-            #貨態資訊
-            status = []
-            for element in shipping.find_all('li'):
-                status_date = re.findall(r"\d{4}/\d{2}/\d{2} \d{2}:\d{2}", element.text)[0]
-                status.append(status_date + ' ' + (element.text).replace(status_date, ''))
-            status.reverse()
-            tracker = {
-                '取貨門市': store_name,
-                '取貨門市地址': store_address,
-                '取貨截止日': pickup_deadline,
-                '付款資訊': payment_type,
-                '貨態資訊': status
-            }
-            return tracker
+            if (body.find('input', {'id': 'txtPage'})['value']) == '2':
+                info_children = body.find('div', {'class': 'info'}).find_all('div', recursive=False)
+                shipping = body.find('div', {'class': 'shipping'})
+                pickup_info = info_children[0]
+                #取貨門市
+                store_name = pickup_info.find('span', {'id': 'store_name'}).text
+                #取貨門市地址
+                store_address = pickup_info.find('p', {'id': 'store_address'}).text
+                #取貨截止日
+                pickup_deadline = pickup_info.find('span', {'id': 'deadline'}).text
+                #付款資訊
+                payment_type = info_children[1].find('h4', {'id': 'servicetype'}).text
+                #貨態資訊
+                status = []
+                for element in shipping.find_all('li'):
+                    status_date = re.findall(r"\d{4}/\d{2}/\d{2} \d{2}:\d{2}", element.text)[0]
+                    status.append(status_date + ' ' + (element.text).replace(status_date, ''))
+                status.reverse()
+                tracker = {
+                    '取貨門市': store_name,
+                    '取貨門市地址': store_address,
+                    '取貨截止日': pickup_deadline,
+                    '付款資訊': payment_type,
+                    '貨態資訊': status
+                }
+                return tracker
+            raise VerifyError('Verify identify image error.')
 
 
 if __name__ == '__main__':
     ECTRACKER = ECTracker()
-    print(ECTRACKER.tracker('F45913208600'))
+    print(ECTRACKER.tracker('F45913208600', autoVerify=True))
