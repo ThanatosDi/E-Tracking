@@ -11,16 +11,16 @@
    [Linux 安裝 tesseract](https://github.com/tesseract-ocr/tesseract/wiki)  
    [Windows 安裝 tesseract](https://github.com/UB-Mannheim/tesseract/wiki)  
 # API Reference
-* ECTracker: [class]
-  * tracker(txtProductNum, autoVerify=False, tesseract_path='tesseract')  
+* ECTracker(tesseract_path='tesseract'): [class]
+  * tesseract_path: [str] 設定 tesseract 路徑 (default: tesseract) 
+* ECTracker.tracker(txtProductNum, autoVerify=False, tesseract_path='tesseract'): [function]  
     * txtProductNum: [str] 貨態號碼 詳細請至[貨態號碼查詢教學](https://eservice.7-11.com.tw/e-tracking/TeachPage.html)查看  
     * autoVerify: [Boolean] 是否啟用 OCR 自動辨識驗證碼 (default: False)
-    * tesseract_path: [str] 設定 tesseract 路徑 (default: tesseract)  
 # Use
 ```python
 # import ECTracker class
 from .etracking import ECTracker
-ECTRACKER = ECTracker()
+ECTRACKER = ECTracker(tesseract_path='path_of_tesseract/tesseract')
 # ECTRACKER.tracker('txtProductNum', autoVerify=True)
 print(ECTRACKER.tracker('F45913208600', autoVerify=True))
 # Return message (type is dictionary)
