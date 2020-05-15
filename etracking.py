@@ -11,9 +11,10 @@ class CodeNotFound(Exception):
 class VerifyError(Exception):
     pass
 class ECTracker():
-    def __init__(self):
+    def __init__(self, tesseract_path='tesseract'):
         self.api = 'https://eservice.7-11.com.tw/E-Tracking'
         self.session = requests.Session()
+        self.tesseract_path = tesseract_path
     def get_resource(self):
         """取得網頁 cookies、headers 等資源"""
         with self.session.get(f'{self.api}/search.aspx', headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36'}) as response:
@@ -44,13 +45,13 @@ class ECTracker():
                 response.raise_for_status()
             with open('./codeImg.jpg', 'wb') as file_io:
                 file_io.write(response.content)
-    def tracker(self, txtProductNum, autoVerify=False, tesseract_path='tesseract'):
+    def tracker(self, txtProductNum, autoVerify=False):
         resource = self.get_resource()
         if not autoVerify:
             code = input('請輸入驗證碼: ')
         else:
             try:
-                ocr = OCR(tesseract_cmd=tesseract_path)
+                ocr = OCR(tesseract_cmd=self.tesseract_path)
                 code = ocr.convert('./codeImg.jpg')
             except:
                 raise Exception
@@ -102,5 +103,5 @@ class ECTracker():
 
 
 if __name__ == '__main__':
-    ECTRACKER = ECTracker()
+    ECTRACKER = ECTracker(tesseract_path='C:/Program Files/Tesseract-OCR/tesseract')
     print(ECTRACKER.tracker('F45913208600', autoVerify=True))
