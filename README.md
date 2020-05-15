@@ -1,3 +1,4 @@
+[![GitHub release](https://img.shields.io/github/pipenv/locked/python-version/thanatosdi/E-Tracking)]()
 # E-Tracking
  統一超商交貨便貨態查詢(包含 OCR 自動辨識驗證碼)
 # Install
@@ -38,3 +39,6 @@ print(ECTRACKER.tracker('F45913208600', autoVerify=True))
     ]
 }
 ```
+# Error
+使用 OCR 自動判斷驗證碼錯誤時將拋出例外: `VerifyError`  
+請自行進行例外處理(重新執行至正確或中斷)
