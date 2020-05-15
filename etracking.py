@@ -44,13 +44,13 @@ class ECTracker():
                 response.raise_for_status()
             with open('./codeImg.jpg', 'wb') as file_io:
                 file_io.write(response.content)
-    def tracker(self, txtProductNum, autoVerify=False):
+    def tracker(self, txtProductNum, autoVerify=False, tesseract_path='tesseract'):
         resource = self.get_resource()
         if not autoVerify:
             code = input('請輸入驗證碼: ')
         else:
             try:
-                ocr = OCR()
+                ocr = OCR(tesseract_cmd=tesseract_path)
                 code = ocr.convert('./codeImg.jpg')
             except:
                 raise Exception
