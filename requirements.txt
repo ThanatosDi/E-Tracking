@@ -1,10 +1,10 @@
--i https://pypi.org/simple
+-i https://pypi.org/simple/
 beautifulsoup4==4.9.0
 bs4==0.0.1
 certifi==2020.4.5.1
 chardet==3.0.4
 idna==2.9
-pillow==7.1.1
+pillow==8.1.1
 pytesseract==0.3.3
 requests==2.23.0
 soupsieve==2.0
