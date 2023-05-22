@@ -10,9 +10,10 @@ beautifulsoup4==4.9.0
 bs4==0.0.1
 certifi==2022.12.7
 chardet==3.0.4
+charset-normalizer==3.1.0; python_full_version >= '3.7.0'
 idna==2.9
-pillow==9.3.0; python_version >= '3.7'
+pillow==9.5.0; python_full_version >= '3.7.0'
 pytesseract==0.3.3
-requests==2.23.0
+requests==2.31.0
 soupsieve==2.0
-urllib3==1.26.5
+urllib3==1.25.8
