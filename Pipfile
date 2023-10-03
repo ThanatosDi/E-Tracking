@@ -14,7 +14,7 @@ chardet = "==3.0.4"
 idna = "==2.9"
 requests = "==2.31.0"
 soupsieve = "==2.0"
-urllib3 = "==1.26.5"
+urllib3 = "==1.26.17"
 pytesseract = "*"
 
 [requires]
